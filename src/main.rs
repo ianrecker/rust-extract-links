@@ -1,6 +1,7 @@
 use error_chain::error_chain;
 use select::document::Document;
 use select::predicate::Name;
+use std::io::{self, Write}; 
 
 error_chain! {
       foreign_links {
@@ -11,10 +12,16 @@ error_chain! {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-  let res = reqwest::get("https://www.rust-lang.org/en-US/")
-    .await?
-    .text()
-    .await?;
+  print!("Enter URL: ");
+  io::stdout().flush().unwrap();
+
+  let mut url = String::new();
+  io::stdin().read_line(&mut url)?;
+
+  let res = reqwest::get(url.trim())
+  .await?
+  .text()
+  .await?;
 
   Document::from(res.as_str())
     .find(Name("a"))
